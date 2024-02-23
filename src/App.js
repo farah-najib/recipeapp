@@ -9,9 +9,9 @@ import { SwitchButton } from './components/styles/SwitchButton'
 
 function App() {
     const { theme, toggleTheme } = useContext(ThemeContext)
-    const themememo = useMemo(() => (theme === 'light' ? lightTheme : darkTheme),[theme]);
+    const themeMemo = useMemo(() => (theme === 'light' ? lightTheme : darkTheme),[theme]);
     return (
-        <ThemeProvider theme={themememo}>
+        <ThemeProvider theme={themeMemo}>
             <>
                 <GlobalStyles />
 

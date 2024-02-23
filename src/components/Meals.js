@@ -1,6 +1,6 @@
 import { useReducer, useEffect ,useCallback } from 'react'
 import axios from "axios";
-import Card from "./Card";
+import CardMeal from "./CardMeal";
 
 const initialState = {
     meals: [],
@@ -58,7 +58,7 @@ const Meals = () => {
             ) : error ? (
                 <p>{error}</p>
             ) : (
-                meals.length !== 0 ? (meals.map((meal, index)=> <Card key={index} meal={meal} /> )) : <></>
+                meals.length !== 0 ? (meals.map((meal, index)=> <CardMeal key={index} meal={meal} /> )) : <></>
             )}
         </div>
     )

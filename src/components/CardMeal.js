@@ -3,7 +3,7 @@ import { StyleCard } from './styles/Card.styled'
 import Button from "./styles/Button";
 
 
-const Card = ({ meal }) => {
+const CardMeal = ({ meal }) => {
     return (
         <StyleCard>
             <img src={meal.strMealThumb} alt="" />
@@ -16,4 +16,4 @@ const Card = ({ meal }) => {
     )
 }
 
-export default Card
+export default CardMeal
