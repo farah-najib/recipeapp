@@ -3,15 +3,15 @@ import { StyleCard } from './styles/Card.styled'
 import Button from "./styles/Button";
 
 
-const CardMeal = ({ meal }) => {
+const CardMeal = ({ meal, onShowRecipe }) => {
     return (
         <StyleCard>
             <img src={meal.strMealThumb} alt="" />
             <h1>{meal.strMeal}</h1>
             <p>
-            {meal.strCategory}, {meal.strArea}, {meal.strTags}
+                {meal.strCategory}, {meal.strArea}, {meal.strTags}
             </p>
-            <Button >Show Recipe</Button>
+            <Button onClick={() => onShowRecipe(meal)}>Show Recipe</Button>
         </StyleCard>
     )
 }
