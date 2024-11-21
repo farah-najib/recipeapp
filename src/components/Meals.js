@@ -1,6 +1,7 @@
-import { useReducer, useEffect ,useCallback } from 'react'
+import { useReducer, useEffect ,useCallback,useState } from 'react'
 import axios from "axios";
 import CardMeal from "./CardMeal";
+import {DetailMeal} from "./DetailMeal"
 
 const initialState = {
     meals: [],
@@ -35,21 +36,29 @@ const mealsReducer = (state, action) => {
 
 
 const Meals = () => {
-    const [dispatch, setDispatch] = useReducer(mealsReducer, initialState);
-    const { meals, loading, error } = dispatch;
+    const [dispatch, setDispatch] = useReducer(mealsReducer, initialState)
+    const [selectedMeal, setSelectedMeal] = useState(null) // State for selected meal
+    const { meals, loading, error } = dispatch
 
     const getMeals = useCallback(async () => {
-        const response = await axios.get('https://www.themealdb.com/api/json/v1/1/search.php?f=a');
+
+        const response = await axios.get(
+            'https://www.themealdb.com/api/json/v1/1/search.php?f=a'
+        )
         if (response.status === 200)
-        setDispatch({ type: response.status, data: response.data })
-    else
-        setDispatch({ type: response.status, error: response.error })
-      }, []);
+            setDispatch({ type: response.status, data: response.data })
+        else setDispatch({ type: response.status, error: response.error })
+    }, [])
 
     useEffect(() => {
-
         getMeals()
-    },[getMeals])
+    }, [getMeals])
+     const handleShowRecipe = (meal) => {
+         setSelectedMeal(meal) // Set the selected meal when button is clicked
+     }
+        const handleCloseModal = () => {
+            setSelectedMeal(null) // Close modal by resetting selected meal
+        }
 
     return (
         <div>
@@ -57,8 +66,20 @@ const Meals = () => {
                 <p>loading...</p>
             ) : error ? (
                 <p>{error}</p>
+            ) : meals.length !== 0 ? (
+                meals.map((meal, index) => (
+                    <CardMeal
+                        key={index}
+                        meal={meal}
+                        onShowRecipe={handleShowRecipe}
+                    />
+                ))
             ) : (
-                meals.length !== 0 ? (meals.map((meal, index)=> <CardMeal key={index} meal={meal} /> )) : <></>
+                <></>
+            )}{' '}
+            {/* Render the modal with meal details when a meal is selected */}
+            {selectedMeal && (
+                <DetailMeal meal={selectedMeal} onClose={handleCloseModal} />
             )}
         </div>
     )
