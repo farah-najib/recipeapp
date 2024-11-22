@@ -43,7 +43,7 @@ const Meals = () => {
     const getMeals = useCallback(async () => {
 
         const response = await axios.get(
-            'https://www.themealdb.com/api/json/v1/1/search.php?f=a'
+            'https:/www.themealdb.com/api/json/v1/1/search.php?f=s'
         )
         if (response.status === 200)
             setDispatch({ type: response.status, data: response.data })
