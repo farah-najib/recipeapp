@@ -1,72 +1,88 @@
-import { useReducer, useEffect ,useCallback,useState } from 'react'
-import axios from "axios";
-import CardMeal from "./CardMeal";
-import {DetailMeal} from "./DetailMeal"
+import { useReducer, useEffect, useCallback, useState } from 'react'
+import axios from 'axios'
+import CardMeal from './CardMeal'
+import { DetailMeal } from './DetailMeal'
 
 const initialState = {
-    meals: [],
+    meals: [], 
     loading: false,
     error: null
 }
 
+
 const mealsReducer = (state, action) => {
     switch (action.type) {
-        case -1: {
+        case 'FETCH_START':
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
-        }
-        case 200: {
-            return {
-                ...state,
-                loading: false,
-                meals: action.data.meals
-            }
-        }
-        default: {
+        case 'FETCH_SUCCESS':
             return {
                 ...state,
                 loading: false,
-                error: action.error
+                meals: action.payload.meals || []
             }
-        }
+        case 'FETCH_ERROR':
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.error || 'Unknown error occurred'
+            }
+        default:
+            return state
     }
 }
 
-
 const Meals = () => {
-    const [dispatch, setDispatch] = useReducer(mealsReducer, initialState)
-    const [selectedMeal, setSelectedMeal] = useState(null) // State for selected meal
-    const { meals, loading, error } = dispatch
+    const [state, dispatch] = useReducer(mealsReducer, initialState)
+    const [selectedMeal, setSelectedMeal] = useState(null)
+    const { meals, loading, error } = state
+
 
     const getMeals = useCallback(async () => {
-
-        const response = await axios.get(
-            'https:/www.themealdb.com/api/json/v1/1/search.php?f=s'
-        )
-        if (response.status === 200)
-            setDispatch({ type: response.status, data: response.data })
-        else setDispatch({ type: response.status, error: response.error })
+        dispatch({ type: 'FETCH_START' })
+        try {
+            const response = await axios.get(
+                'https://www.themealdb.com/api/json/v1/1/search.php?f=s'
+            )
+            if (response.status === 200) {
+                dispatch({
+                    type: 'FETCH_SUCCESS',
+                    payload: { meals: response.data.meals }
+                })
+            } else {
+                dispatch({
+                    type: 'FETCH_ERROR',
+                    payload: { error: `Error: ${response.statusText}` }
+                })
+            }
+        } catch (err) {
+            dispatch({
+                type: 'FETCH_ERROR',
+                payload: { error: err.message || 'Network error' }
+            })
+        }
     }, [])
+
 
     useEffect(() => {
         getMeals()
     }, [getMeals])
-     const handleShowRecipe = (meal) => {
-         setSelectedMeal(meal) // Set the selected meal when button is clicked
-     }
-        const handleCloseModal = () => {
-            setSelectedMeal(null) // Close modal by resetting selected meal
-        }
+
+
+    const handleShowRecipe = (meal) => setSelectedMeal(meal)
+    const handleCloseModal = () => setSelectedMeal(null)
+
 
     return (
         <div>
             {loading ? (
-                <p>loading...</p>
+                <p>Loading...</p>
             ) : error ? (
-                <p>{error}</p>
-            ) : meals.length !== 0 ? (
+                <p style={{ color: 'red' }}>{error}</p>
+            ) : meals && meals.length > 0 ? (
                 meals.map((meal, index) => (
                     <CardMeal
                         key={index}
@@ -75,8 +91,8 @@ const Meals = () => {
                     />
                 ))
             ) : (
-                <></>
-            )}{' '}
+                <p>No meals found.</p>
+            )}
             {/* Render the modal with meal details when a meal is selected */}
             {selectedMeal && (
                 <DetailMeal meal={selectedMeal} onClose={handleCloseModal} />
